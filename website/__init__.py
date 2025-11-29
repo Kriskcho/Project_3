@@ -6,11 +6,11 @@ import os
 
 db = SQLAlchemy()
 
-DB_USER = "root"
-DB_PASSWORD = "Czechoslovakia"
-DB_HOST = "localhost"
-DB_PORT = 3306
-DB_NAME = "fitness_tracker"
+DB_USER = os.environ.get("DB_USER", "root")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_HOST = os.environ.get("DB_HOST", "localhost")
+DB_PORT = int(os.environ.get("DB_PORT", 3306))
+DB_NAME = os.environ.get("DB_NAME", "fitness_tracker")
 
 def ensure_database_exists():
     try:
@@ -22,7 +22,7 @@ def ensure_database_exists():
         )
         conn.autocommit(True)
         cursor = conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}`")
         cursor.close()
         conn.close()
         print(f"Database '{DB_NAME}' ensured.")

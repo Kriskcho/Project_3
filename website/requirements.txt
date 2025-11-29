@@ -1,0 +1,7 @@
+Flask==2.3.0
+Flask-SQLAlchemy==3.0.0
+Flask-Login==0.6.2
+PyMySQL==1.1.0
+werkzeug==2.3.0
+azure-ai-inference==1.0.0
+azure-core==1.29.0

@@ -19,27 +19,29 @@ SYSTEM_PROMPT = (
 def ask_ai(user_text, chat_history):
     """
     user_text: the latest user message (string)
-    chat_history: list of dict objects from DB with keys: message, sender
+    chat_history: list of ChatMessage objects from DB
     """
-    messages = [SystemMessage(content=SYSTEM_PROMPT)]
+    try:
+        messages = [SystemMessage(content=SYSTEM_PROMPT)]
 
-    # Load chat history from your DB
-    for msg in chat_history:
-        if msg.sender == "user":
-            messages.append(UserMessage(content=[TextContentItem(text=msg.message)]))
-        else:
-            # bot message
-            messages.append({"role": "assistant", "content": msg.message})
+        for msg in chat_history:
+            if msg.sender == "user":
+                messages.append(UserMessage(content=[TextContentItem(text=msg.message)]))
+            else:
+                messages.append({"role": "assistant", "content": msg.message})
 
-    # Add latest user message
-    messages.append(UserMessage(content=[TextContentItem(text=user_text)]))
+        messages.append(UserMessage(content=[TextContentItem(text=user_text)]))
 
-    response = client.complete(
-        messages=messages,
-        model="openai/gpt-4.1",
-        temperature=1,
-        top_p=1,
-        response_format="text"
-    )
+        response = client.complete(
+            messages=messages,
+            model="openai/gpt-4",
+            temperature=1,
+            top_p=1,
+            response_format="text"
+        )
 
-    return response.choices[0].message.content
+        return response.choices[0].message.content
+    
+    except Exception as e:
+        print(f"AI API Error: {e}")
+        return "I'm having trouble connecting right now. Please try again later."
