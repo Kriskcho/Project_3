@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}My Account{% endblock %}
+{% block content %}
+<br>
+<div class="max-w-md mx-auto px-4 py-12">
+  {% if not current_user.is_authenticated %}
+    <div class="card">
+      <div class="card-header text-center">
+        <h2 class="text-2xl font-bold">Welcome Back</h2>
+        <p class="text-sm text-gray-600 mt-2">
+          Log in to track your progress and connect with the community
+        </p>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-4">
+          
+          <div class="y-2">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
+          </div>
+          <br>
+          <div class="y-2">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+          </div>
+          <br>
+          <button type="submit" class="btn btn-primary w-full">Log In</button>
+
+          <div class="text-center pt-4 border-t">
+            <p class="text-sm text-gray-600">
+              Don't have an account?
+              <a href="{{ url_for('auth.sign_up') }}" class="text-purple-600 hover:underline">Sign Up</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% else %}
+  <center>
+    <h1>Welcome, {{ current_user.username }}!</h1>
+    <div class="mt-6">
+      <h2>Account Information</h2>
+      <br>
+      <p>Email: {{ current_user.email }}</p>
+      <p>Username: {{ current_user.username }}</p>
+      <p>Member since: {{ current_user.date_joined.strftime('%d %b, %Y') }}</p>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-primary mt-4">Log Out</a>
+      <a href="{{ url_for('auth.change_password') }}" class="btn btn-success mt-4">Change Password</a>
+      <a href="{{ url_for('auth.delete_account') }}" class="btn btn-danger mt-4">Delete Account</a>
+    </div>
+   </center>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

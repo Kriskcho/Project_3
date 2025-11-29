@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+{% if not current_user.is_authenticated %}
+    <br><br>
+    <center>
+        <a>Welcome to Your Dashboard</a><br>
+        <a>Please log in to view your personalized fitness statistics and progress.</a><br><br>
+        <a href="{{ url_for('views.myaccount') }}" class="btn btn-primary btn-lg">Log In to Continue</a>
+    </center>
+{% else %}
+<br>
+<div class="container">
+  <h1 class="text-center mb-4">Dashboard for {{ current_user.username }}</h1>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h3>{{ stats.total_sessions }}</h3>
+          <p class="text-muted mb-0">Sessions Logged</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h3>{{ stats.total_minutes }}</h3>
+          <p class="text-muted mb-0">Total Minutes</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h3>{{ stats.calories_burned }}</h3>
+          <p class="text-muted mb-0">Calories Burned</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if recent %}
+  <h4 class="mt-4">Recent Activity</h4>
+  <ul class="list-group mb-4">
+    {% for ex in recent %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ ex.title }} ({{ ex.duration_minutes }} min) ({{ ex.calories_burned }} cal)<br>
+          <small class="text-muted">{{ ex.date_completed.strftime('%b %d %I:%M %p') }}</small>
+        </span>
+        <form method="POST" action="{{ url_for('views.delete_exercise', exercise_id=ex.id) }}" onsubmit="return confirm('Delete this logged exercise?')">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <div class="alert alert-info">No exercises logged yet. Visit the <a href="{{ url_for('views.exercises') }}">Exercise Library</a> to start.</div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}{{ exercise.name }}{% endblock %}
+{% block content %}
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <a href="{{ url_for('views.exercises') }}" class="btn btn-secondary mb-3">
+                ← Back to Exercises
+            </a>
+
+            <div class="card shadow-lg mb-4">
+                {% if exercise.image_url %}
+                    <img src="{{ url_for('static', filename=exercise.image_url) }}" class="card-img-top" alt="{{ exercise.name }}" style="max-height: 400px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <span class="text-muted h3">{{ exercise.name }}</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title">{{ exercise.name }}</h1>
+                    <p class="text-muted">{{ exercise.description }}</p>
+
+                    <div class="mb-4">
+                        <span class="badge badge-lg 
+                            {% if exercise.difficulty == 'Beginner' %}badge-success
+                            {% elif exercise.difficulty == 'Intermediate' %}badge-warning
+                            {% else %}badge-danger{% endif %}" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                            {{ exercise.difficulty }}
+                        </span>
+                        <span class="badge badge-info badge-lg" style="font-size: 1rem; padding: 0.5rem 1rem;">{{ exercise.exercise_type }}</span>
+                    </div>
+
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h3 class="text-primary">{{ exercise.duration_minutes }}</h3>
+                                    <p class="text-muted mb-0">Minutes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h3 class="text-success">{{ exercise.calories_burned }}</h3>
+                                    <p class="text-muted mb-0">Calories Burned</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    {% if exercise.requires_equipment %}
+                                        <h3 class="text-warning">Requires</h3>
+                                        <p class="text-muted mb-0">Equipment</p>
+                                    {% else %}
+                                        <h3 class="text-success">✓</h3>
+                                        <p class="text-muted mb-0">No Equipment</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if exercise.requires_equipment and exercise.equipment_needed %}
+                        <div class="alert alert-warning">
+                            <h5><strong>Equipment Needed:</strong></h5>
+                            <p class="mb-0">{{ exercise.equipment_needed }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if exercise.instructions %}
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">How to Perform</h4>
+                            </div>
+                            <div class="card-body">
+                                <div style="white-space: pre-line;">{{ exercise.instructions }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if exercise.benefits %}
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h4 class="mb-0">Benefits</h4>
+                            </div>
+                            <div class="card-body">
+                                <div style="white-space: pre-line;">{{ exercise.benefits }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated %}
+                        <form method="POST" action="{{ url_for('views.log_completed_exercise', exercise_id=exercise.id) }}">
+                            <button type="submit" class="btn btn-success btn-lg btn-block">
+                                ✓ Mark as Completed
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{{ url_for('views.myaccount') }}" class="btn btn-primary btn-lg btn-block">
+                            Log In to Track This Exercise
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}
