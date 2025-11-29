@@ -67,5 +67,5 @@ class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     message = db.Column(db.String(500))
-    sender = db.Column(db.String(20))  # 'user' or 'bot'
+    sender = db.Column(db.String(20))
     date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
