@@ -223,7 +223,7 @@ def populate_sample_exercises():
             image_url="pushups.jpg"
         ),
         ExerciseLibrary(
-            name="Squats",
+            name="Squats 11",
             description="Lower body exercise targeting quads, hamstrings, and glutes.",
             difficulty="Beginner",
             duration_minutes=15,
