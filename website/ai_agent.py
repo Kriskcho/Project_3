@@ -34,7 +34,7 @@ def ask_ai(user_text, chat_history):
 
         response = client.complete(
             messages=messages,
-            model="openai/gpt-4",
+            model="openai/gpt-4.1",
             temperature=1,
             top_p=1,
             response_format="text"
