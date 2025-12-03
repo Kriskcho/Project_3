@@ -1,13 +1,12 @@
 import os
 from azure.ai.inference import ChatCompletionsClient
-from azure.ai.inference.models import SystemMessage, UserMessage, TextContentItem, AssistantMessage
+from azure.ai.inference.models import SystemMessage, UserMessage, AssistantMessage
 import traceback
 from azure.core.credentials import AzureKeyCredential
 
 client = ChatCompletionsClient(
     endpoint="https://models.github.ai/inference",
     credential=AzureKeyCredential(os.environ["GITHUB_TOKEN"]),
-    api_version="2024-08-01-preview",
 )
 
 SYSTEM_PROMPT = (
@@ -31,18 +30,17 @@ def ask_ai(user_text, chat_history):
 
         for msg in recent_history:
             if msg.sender == "user":
-                messages.append(UserMessage(content=[TextContentItem(text=msg.message)]))
+                messages.append(UserMessage(content=msg.message))
             elif msg.sender == "bot":
                 messages.append(AssistantMessage(content=msg.message))
 
-        messages.append(UserMessage(content=[TextContentItem(text=user_text)]))
+        messages.append(UserMessage(content=user_text))
 
         response = client.complete(
             messages=messages,
-            model="openai/gpt-4.1",
-            temperature=1,
-            top_p=1,
-            response_format="text"
+            model="gpt-4o",
+            temperature=0.7,
+            max_tokens=150
         )
 
         if response and response.choices and len(response.choices) > 0:
