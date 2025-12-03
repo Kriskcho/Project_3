@@ -142,7 +142,7 @@
                     {% endfor %}
                 </div>
                 <div class="card-footer">
-                    <form method="POST" action="{{ url_for('views.send_message') }}">
+                    <form method="POST" action="{{ url_for('views.send_message') }}" id="chatForm">
                         <div class="input-group">
                             <input type="text" class="form-control" name="message" placeholder="Ask me anything about fitness..." maxlength="500" required>
                             <div class="input-group-append">
@@ -170,6 +170,18 @@ document.addEventListener('DOMContentLoaded', function() {
     var chatBox = document.getElementById('chatBox');
     if (chatBox) {
         chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Add loading indicator when sending message
+    var chatForm = document.getElementById('chatForm');
+    if (chatForm) {
+        chatForm.addEventListener('submit', function() {
+            var sendBtn = document.getElementById('sendBtn');
+            var messageInput = document.getElementById('messageInput');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            messageInput.disabled = true;
+        });
     }
 });
 </script>

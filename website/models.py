@@ -1,13 +1,13 @@
 from website import db
 from flask_login import UserMixin
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(150))
-    date_joined = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    date_joined = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))
     exercises = db.relationship('Exercise', backref='user', lazy=True)
     posts = db.relationship('Post', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='user', lazy=True)
@@ -34,7 +34,7 @@ class Exercise(db.Model):
     duration_minutes = db.Column(db.Integer)
     calories_burned = db.Column(db.Integer)
     exercise_type = db.Column(db.String(100))
-    date_completed = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    date_completed = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -48,7 +48,7 @@ class Post(db.Model):
     def is_liked_by(self, user):
         return any(like.user_id == user.id for like in self.likes)
     
-    date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    date = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))
     comments = db.relationship('Comment', backref='post', lazy=True)
 
 class Comment(db.Model):
@@ -56,7 +56,7 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     content = db.Column(db.String(300))
-    date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    date = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,4 +68,4 @@ class ChatMessage(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     message = db.Column(db.String(500))
     sender = db.Column(db.String(20))
-    date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    date = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))

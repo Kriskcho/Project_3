@@ -176,7 +176,11 @@ def send_message():
 
     user_message = request.form.get('message')
 
-    if user_message and len(user_message) <= 500:
+    if not user_message or len(user_message) > 500:
+        flash('Invalid message length.', category='error')
+        return redirect(url_for('views.community'))
+
+    try:
         new_user_msg = ChatMessage(
             user_id=current_user.id,
             message=user_message,
@@ -191,16 +195,29 @@ def send_message():
 
         ai_reply = ask_ai(user_message, chat_history)
 
-        new_bot_msg = ChatMessage(
-            user_id=current_user.id,
-            message=ai_reply,
-            sender='bot'
-        )
-        db.session.add(new_bot_msg)
-        db.session.commit()
+        if ai_reply:
+            new_bot_msg = ChatMessage(
+                user_id=current_user.id,
+                message=ai_reply,
+                sender='bot'
+            )
+            db.session.add(new_bot_msg)
+            db.session.commit()
+        else:
+            fallback_msg = ChatMessage(
+                user_id=current_user.id,
+                message="I'm having trouble responding right now. Please try again.",
+                sender='bot'
+            )
+            db.session.add(fallback_msg)
+            db.session.commit()
+
+    except Exception as e:
+        print(f"Error in send_message: {e}")
+        flash('An error occurred while sending your message.', category='error')
+        db.session.rollback()
 
     return redirect(url_for('views.community'))
-
 
 @views.route('/myaccount', methods=['GET', 'POST'])
 def myaccount():
