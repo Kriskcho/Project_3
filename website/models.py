@@ -8,10 +8,10 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(150))
     date_joined = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))
-    exercises = db.relationship('Exercise', backref='user', lazy=True)
-    posts = db.relationship('Post', backref='user', lazy=True)
-    comments = db.relationship('Comment', backref='user', lazy=True)
-    chat_messages = db.relationship('ChatMessage', backref='user', lazy=True)
+    exercises = db.relationship('Exercise', backref='user', lazy=True, cascade="all, delete-orphan")
+    posts = db.relationship('Post', backref='user', lazy=True, cascade="all, delete-orphan")
+    comments = db.relationship('Comment', backref='user', lazy=True, cascade="all, delete-orphan")
+    chat_messages = db.relationship('ChatMessage', backref='user', lazy=True, cascade="all, delete-orphan")
 
 class ExerciseLibrary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,7 +40,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     content = db.Column(db.String(500))
-    likes = db.relationship('Like', backref='post', lazy=True)
+    likes = db.relationship('Like', backref='post', lazy=True, cascade="all, delete-orphan")
     
     def like_count(self):
         return len(self.likes)
@@ -49,7 +49,7 @@ class Post(db.Model):
         return any(like.user_id == user.id for like in self.likes)
     
     date = db.Column(db.DateTime, default=datetime.now(timezone.utc) + timedelta(hours=1))
-    comments = db.relationship('Comment', backref='post', lazy=True)
+    comments = db.relationship('Comment', backref='post', lazy=True, cascade="all, delete-orphan")
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
