@@ -104,22 +104,26 @@ def delete_account():
     if request.method == 'POST':
         confirm = request.form.get('confirm')
         if confirm == 'DELETE':
-            from .models import Exercise, Post, Comment, Like, ChatMessage
-            user = User.query.get(current_user.id)
-
-            Exercise.query.filter_by(user_id=user.id).delete()
-            Post.query.filter_by(user_id=user.id).delete()
-            Comment.query.filter_by(user_id=user.id).delete()
-            Like.query.filter_by(user_id=user.id).delete()
-            ChatMessage.query.filter_by(user_id=user.id).delete()
-
-            db.session.delete(user)
-            db.session.commit()
-            logout_user()
-            flash('Your account has been deleted.', category='success')
-            return redirect(url_for('views.myaccount'))
+            try:
+                user_id = current_user.id
+                
+                logout_user()
+                
+                user = User.query.get(user_id)
+                if user:
+                    db.session.delete(user)
+                    db.session.commit()
+                    flash('Your account has been deleted.', category='success')
+                else:
+                    flash('User not found.', category='error')
+                    
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while deleting your account. Please try again.', category='error')
+                print(f"Error deleting account: {e}")
+                
+            return redirect(url_for('views.home'))
         else:
             flash('Please type DELETE to confirm.', category='error')
     
     return render_template('delete_account.html', user=current_user)
-    
