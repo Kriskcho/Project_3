@@ -104,7 +104,15 @@ def delete_account():
     if request.method == 'POST':
         confirm = request.form.get('confirm')
         if confirm == 'DELETE':
+            from .models import Exercise, Post, Comment, Like, ChatMessage
             user = User.query.get(current_user.id)
+
+            Exercise.query.filter_by(user_id=user.id).delete()
+            Post.query.filter_by(user_id=user.id).delete()
+            Comment.query.filter_by(user_id=user.id).delete()
+            Like.query.filter_by(user_id=user.id).delete()
+            ChatMessage.query.filter_by(user_id=user.id).delete()
+
             db.session.delete(user)
             db.session.commit()
             logout_user()
