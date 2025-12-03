@@ -168,55 +168,43 @@ def delete_comment(comment_id):
         flash('Comment deleted.', category='success')
     return redirect(url_for('views.community'))
 
+from .models import ChatMessage
+from .ai_agent import ask_ai
+
 @views.route('/send-message', methods=['POST'])
 @login_required
 def send_message():
-    from .models import ChatMessage
-    from .ai_agent import ask_ai
-
     user_message = request.form.get('message')
-
-    if not user_message or len(user_message) > 500:
-        flash('Invalid message length.', category='error')
+    
+    if not user_message or len(user_message.strip()) == 0:
+        flash('Message cannot be empty.', category='error')
         return redirect(url_for('views.community'))
-
-    try:
-        new_user_msg = ChatMessage(
-            user_id=current_user.id,
-            message=user_message,
-            sender='user'
-        )
-        db.session.add(new_user_msg)
-        db.session.commit()
-
-        chat_history = ChatMessage.query.filter_by(
-            user_id=current_user.id
-        ).order_by(ChatMessage.date.asc()).all()
-
-        ai_reply = ask_ai(user_message, chat_history)
-
-        if ai_reply:
-            new_bot_msg = ChatMessage(
-                user_id=current_user.id,
-                message=ai_reply,
-                sender='bot'
-            )
-            db.session.add(new_bot_msg)
-            db.session.commit()
-        else:
-            fallback_msg = ChatMessage(
-                user_id=current_user.id,
-                message="I'm having trouble responding right now. Please try again.",
-                sender='bot'
-            )
-            db.session.add(fallback_msg)
-            db.session.commit()
-
-    except Exception as e:
-        print(f"Error in send_message: {e}")
-        flash('An error occurred while sending your message.', category='error')
-        db.session.rollback()
-
+    
+    if len(user_message) > 500:
+        flash('Message too long. Max 500 characters.', category='error')
+        return redirect(url_for('views.community'))
+    
+    new_user_msg = ChatMessage(
+        user_id=current_user.id,
+        message=user_message,
+        sender='user'
+    )
+    db.session.add(new_user_msg)
+    db.session.commit()
+    
+    chat_history = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.id).all()
+    
+    ai_response = ask_ai(user_message, chat_history)
+    
+    new_bot_msg = ChatMessage(
+        user_id=current_user.id,
+        message=ai_response,
+        sender='bot'
+    )
+    db.session.add(new_bot_msg)
+    db.session.commit()
+    
+    flash('Message sent!', category='success')
     return redirect(url_for('views.community'))
 
 @views.route('/myaccount', methods=['GET', 'POST'])
